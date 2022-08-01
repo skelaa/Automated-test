@@ -109,7 +109,7 @@ public class CtcoTest {
 		int expectedSkillAmount = 8;
 		int actualSkillAmount = skillListItems.size();
 		
-		Assert.assertEquals(expectedSkillAmount, actualSkillAmount);
+		Assert.assertEquals("Invalid skill count", expectedSkillAmount, actualSkillAmount);
 		
 		driver.quit();
 	}
