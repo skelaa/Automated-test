@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.After;
+import org.junit.Before;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -15,15 +17,21 @@ public class CtcoTest {
 	public String menuItemsSelector = "#menu-main a";
 	public String menuVacanciesSelector = ".menu-main-container a";
 	public String vacancySelector = ".vacancies-second-contents.active .wysiwyg";
+	public WebDriver driver;
 
-	@Test
-	public void test() throws Exception {
+	@Before
+	public void beforeTest() throws InterruptedException {
+		
 		System.setProperty("webdriver.chrome.driver", "chromedriver");
 		
-		WebDriver driver =  new ChromeDriver();
+		driver =  new ChromeDriver();
 		driver.manage().window().maximize();
 		driver.get(url);		
 		Thread.sleep(1000);
+	}
+	
+	@Test
+	public void test() throws InterruptedException {
 		
 		List<WebElement> links = driver.findElements(By.cssSelector(menuItemsSelector));
 		
@@ -42,21 +50,16 @@ public class CtcoTest {
 			}	
 		}
 		
-		if (careersLink != null) {
-			Actions actions = new Actions(driver);
-			actions.moveToElement(careersLink).perform();
-			Thread.sleep(1000);
-		} else {
-			throw new Exception("Careers link not found");
-		}
+		Assert.assertNotNull("Careers link not found", careersLink);
+		Assert.assertNotNull("Vacancies link not found", vacanciesLink);
+	
+		Actions actions = new Actions(driver);
+		actions.moveToElement(careersLink).perform();
+		Thread.sleep(1000);
 		
-		if (vacanciesLink != null) {
-			vacanciesLink.click();
-			Thread.sleep(1000);
-		} else {
-			throw new Exception ("Vacancies link not found");
-		}
-
+		vacanciesLink.click();
+		Thread.sleep(1000);
+	
 		List<WebElement> vacanciesLinks = driver.findElements(By.cssSelector(menuVacanciesSelector));
 		
 		WebElement testAutomationLink = null;
@@ -70,18 +73,14 @@ public class CtcoTest {
 			} 
 		}
 		
-		if (testAutomationLink != null ) {
-			testAutomationLink.click();
-			Thread.sleep(3000);
-		} else {
-			throw new Exception ("Test Autometion Engineer link not found");
-		}
+		Assert.assertNotNull("Test Automation Engineer link not found", testAutomationLink);
 		
+		testAutomationLink.click();
+		Thread.sleep(3000);
+
 		WebElement vacancy = driver.findElement(By.cssSelector(vacancySelector));
 		
-		if (vacancy == null) {
-			throw new Exception("Vacancy container not found");
-		}
+		Assert.assertNotNull("Vacancy container not found", vacancy);
 		
 		List<WebElement> paragraphs = vacancy.findElements(By.tagName("p"));
 		WebElement paragraph = null;
@@ -96,9 +95,7 @@ public class CtcoTest {
 			}
 		}
 		
-		if (paragraph == null) {
-			throw new Exception ("Paragraph 'Professional skills and qualification' not found");
-		}
+		Assert.assertNotNull("Paragraph \"Professional skills and qualification\" not found", paragraph);
 		
 		List<WebElement> vacancyElements = vacancy.findElements(By.xpath("./child::*"));
 		int position = vacancyElements.indexOf(paragraph);
@@ -110,7 +107,10 @@ public class CtcoTest {
 		int actualSkillAmount = skillListItems.size();
 		
 		Assert.assertEquals("Invalid skill count", expectedSkillAmount, actualSkillAmount);
-		
+	}
+	
+	@After
+	public void afterTest() {
 		driver.quit();
 	}
 }
